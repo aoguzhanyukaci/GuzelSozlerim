@@ -104,6 +104,21 @@ namespace GuzelSozlerim.Data.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
+            modelBuilder.Entity("GuzelSozlerim.Data.KullaniciSoz", b =>
+                {
+                    b.Property<int>("GuzelSozId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("KullaniciId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("GuzelSozId", "KullaniciId");
+
+                    b.HasIndex("KullaniciId");
+
+                    b.ToTable("KullaniciSozler");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -239,6 +254,25 @@ namespace GuzelSozlerim.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("GuzelSozlerim.Data.KullaniciSoz", b =>
+                {
+                    b.HasOne("GuzelSozlerim.Data.GuzelSoz", "GuzelSoz")
+                        .WithMany("KullaniciSozler")
+                        .HasForeignKey("GuzelSozId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GuzelSozlerim.Data.Kullanici", "Kullanici")
+                        .WithMany("BegendigiSozler")
+                        .HasForeignKey("KullaniciId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GuzelSoz");
+
+                    b.Navigation("Kullanici");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -288,6 +322,16 @@ namespace GuzelSozlerim.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("GuzelSozlerim.Data.GuzelSoz", b =>
+                {
+                    b.Navigation("KullaniciSozler");
+                });
+
+            modelBuilder.Entity("GuzelSozlerim.Data.Kullanici", b =>
+                {
+                    b.Navigation("BegendigiSozler");
                 });
 #pragma warning restore 612, 618
         }

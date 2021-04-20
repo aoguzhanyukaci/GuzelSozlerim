@@ -48,6 +48,19 @@ namespace GuzelSozlerim.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "GuzelSozler",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Soz = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GuzelSozler", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -153,6 +166,30 @@ namespace GuzelSozlerim.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "KullaniciSozler",
+                columns: table => new
+                {
+                    KullaniciId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    GuzelSozId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_KullaniciSozler", x => new { x.GuzelSozId, x.KullaniciId });
+                    table.ForeignKey(
+                        name: "FK_KullaniciSozler_AspNetUsers_KullaniciId",
+                        column: x => x.KullaniciId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_KullaniciSozler_GuzelSozler_GuzelSozId",
+                        column: x => x.GuzelSozId,
+                        principalTable: "GuzelSozler",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -191,6 +228,11 @@ namespace GuzelSozlerim.Data.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_KullaniciSozler_KullaniciId",
+                table: "KullaniciSozler",
+                column: "KullaniciId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -211,10 +253,16 @@ namespace GuzelSozlerim.Data.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "KullaniciSozler");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "GuzelSozler");
         }
     }
 }
