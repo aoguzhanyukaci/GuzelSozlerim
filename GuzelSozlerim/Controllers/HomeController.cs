@@ -1,11 +1,15 @@
 ﻿using GuzelSozlerim.Data;
+using GuzelSozlerim.Extensions;
 using GuzelSozlerim.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace GuzelSozlerim.Controllers
@@ -15,7 +19,7 @@ namespace GuzelSozlerim.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly ApplicationDbContext _db;
 
-        public HomeController(ILogger<HomeController> logger,ApplicationDbContext dbContext)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext dbContext)
         {
             _logger = logger;
             _db = dbContext;
@@ -23,7 +27,40 @@ namespace GuzelSozlerim.Controllers
 
         public IActionResult Index()
         {
-            return View(_db.GuzelSozler.ToList());
+            return View(_db.GuzelSozler.Include(x=>x.KullaniciSozler).ToList());
+        }
+
+        [Authorize] // sadece üyeler kullanabilir
+        [HttpPost]
+        public IActionResult BegeniDurumuGuncelle(int id, bool begenildiMi)
+        {
+            try
+            {
+                string UserId = User.GetUserId();
+                var begeni = new KullaniciSoz() { GuzelSozId = id, KullaniciId = UserId };
+
+                if (begenildiMi)
+                {
+                    if (!_db.KullaniciSozler.Contains(begeni))
+                    {
+                        _db.KullaniciSozler.Add(begeni);
+                    }
+                }
+                else
+                {
+                    if (_db.KullaniciSozler.Contains(begeni))
+                    {
+                        _db.KullaniciSozler.Remove(begeni);
+                    }
+                }
+                _db.SaveChanges();
+                return new EmptyResult();
+            }
+            catch (Exception)
+            {
+
+                return BadRequest();
+            }
         }
 
         public IActionResult Privacy()
