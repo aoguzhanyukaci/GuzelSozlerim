@@ -27,7 +27,7 @@ namespace GuzelSozlerim.Controllers
 
         public IActionResult Index()
         {
-            return View(_db.GuzelSozler.Include(x=>x.KullaniciSozler).ToList());
+            return View(_db.GuzelSozler.Include("KullaniciSozler.Kullanici").ToList());
         }
 
         [Authorize] // sadece üyeler kullanabilir
